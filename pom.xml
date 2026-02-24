@@ -6,7 +6,7 @@
 
     <groupId>io.github.portlek</groupId>
     <artifactId>AnvilLogin</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>anvil-login</name>
@@ -65,6 +65,10 @@
             <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
         <repository>
+            <id>mvn-wesjd-net</id>
+            <url>https://mvn.wesjd.net/</url>
+        </repository>
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -74,7 +78,8 @@
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
+            <version>1.10.11-SNAPSHOT</version>
+            <scope>compile</scope> <!-- Include the library in your JAR -->
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -85,7 +90,7 @@
         <dependency>
             <groupId>fr.xephi</groupId>
             <artifactId>authme</artifactId>
-            <version>5.6.0-SNAPSHOT</version>
+            <version>5.6.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

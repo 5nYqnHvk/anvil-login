@@ -1,6 +1,8 @@
 package io.github.portlek.anvillogin;
 
 import fr.xephi.authme.api.v3.AuthMeApi;
+import fr.xephi.authme.events.LogoutEvent;
+
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -8,6 +10,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.Arrays;
+import java.util.Collections;
+
 
 public final class AnvilLogin extends JavaPlugin implements Listener {
 
@@ -44,12 +49,24 @@ public final class AnvilLogin extends JavaPlugin implements Listener {
 
     private void openLogin(final Player p) {
         final AnvilGUI.Builder builder = new AnvilGUI.Builder()
-            .onComplete((player, s) -> {
-                if (!this.authmeApi.checkPassword(player.getName(), s)) {
-                    return AnvilGUI.Response.text(this.wrongPassword);
+            .onClick((slot, stateSnapshot) -> {
+                if (slot != AnvilGUI.Slot.OUTPUT) {
+                    return Collections.emptyList();
                 }
+
+                final Player player = stateSnapshot.getPlayer();
+                final String text = stateSnapshot.getText();
+
+                if (!this.authmeApi.checkPassword(player.getName(), text)) {
+                    return Arrays.asList(
+                        AnvilGUI.ResponseAction.replaceInputText(this.wrongPassword)
+                    );
+                }
+
                 this.authmeApi.forceLogin(player);
-                return AnvilGUI.Response.close();
+                return Arrays.asList(
+                    AnvilGUI.ResponseAction.close()
+                );
             })
             .preventClose()
             .text(this.insert)
@@ -60,12 +77,22 @@ public final class AnvilLogin extends JavaPlugin implements Listener {
 
     private void openRegister(final Player p) {
         final AnvilGUI.Builder builder = new AnvilGUI.Builder()
-            .onComplete((player, s) -> {
-                this.authmeApi.registerPlayer(player.getName(), s);
+            .onClick((slot, stateSnapshot) -> {
+                if (slot != AnvilGUI.Slot.OUTPUT) {
+                    return Collections.emptyList();
+                }
+
+                final Player player = stateSnapshot.getPlayer();
+                final String text = stateSnapshot.getText();
+
+                this.authmeApi.registerPlayer(player.getName(), text);
                 if (!this.authmeApi.isAuthenticated(player)) {
                     this.authmeApi.forceLogin(player);
                 }
-                return AnvilGUI.Response.close();
+
+                return Arrays.asList(
+                    AnvilGUI.ResponseAction.close()
+                );
             })
             .preventClose()
             .text(this.insert)
@@ -79,4 +106,8 @@ public final class AnvilLogin extends JavaPlugin implements Listener {
         this.ask(event.getPlayer());
     }
 
+    @EventHandler
+    public void onLogout(final LogoutEvent event) {
+        this.ask(event.getPlayer());
+    }
 }
